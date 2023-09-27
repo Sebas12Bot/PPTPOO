@@ -4,7 +4,7 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
-public class dataBase {
+public class DataBase {
     public static Connection getConnection() {
         String jdbcURL = "jdbc:postgresql://containers-us-west-87.railway.app:6608/railway";
         String username = "postgres";

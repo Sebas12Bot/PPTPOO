@@ -4,7 +4,7 @@ import java.util.Random;
 import javax.swing.*;
 import java.util.Arrays;
 
-public class declaraciones {
+public class Declaraciones {
 
     public static String pedirEleccion(String nombre) {
         return (String) JOptionPane.showInputDialog(null, nombre + " !A jugar!\n" +
@@ -21,15 +21,15 @@ public class declaraciones {
 
     public static String verificarGanador(String eleccionJg1, String eleccionJg2) {
         if (eleccionJg1.equalsIgnoreCase(eleccionJg2)) {
-            ventana.empatadas += 1;
+            Ventana.empatadas += 1;
             return "Empate";
         } else if ((eleccionJg1.equals("Piedra") && eleccionJg2.equals("Tijera")) ||
                 (eleccionJg1.equals("Tijera") && eleccionJg2.equals("Papel")) ||
                 (eleccionJg1.equals("Papel") && eleccionJg2.equals("Piedra"))) {
-            ventana.ganadas += 1;
+            Ventana.ganadas += 1;
             return "Ganaste";
         } else {
-            ventana.perdidas += 1;
+            Ventana.perdidas += 1;
             return "Perdiste";
         }
     }

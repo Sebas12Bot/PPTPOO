@@ -5,7 +5,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-public class user {
+public class User {
     private Connection connection;
     private int id;
     private String username;
@@ -13,17 +13,17 @@ public class user {
     private int derrotas;
     private int empates;
 
-    public user() {
-        connection = dataBase.getConnection();
+    public User() {
+        connection = DataBase.getConnection();
     }
 
-    public user(int id, String username, int victorias, int derrotas, int empates) {
+    public User(int id, String username, int victorias, int derrotas, int empates) {
         this.id = id;
         this.username = username;
         this.victorias = victorias;
         this.derrotas = derrotas;
         this.empates = empates;
-        connection = dataBase.getConnection();
+        connection = DataBase.getConnection();
     }
 
     public int getId() {
@@ -93,7 +93,7 @@ public class user {
         }
     }
 
-    public user obtenerUsuarioPorUsername(String username) {
+    public User obtenerUsuarioPorUsername(String username) {
         String sql = "SELECT u.id, u.username, p.victorias, p.derrotas, p.empates FROM usuarios u " +
                 "LEFT JOIN puntuaciones p ON u.id = p.id_usuario WHERE u.username = ?";
         try {
@@ -107,7 +107,7 @@ public class user {
                 int userVictorias = resultSet.getInt("victorias");
                 int userDerrotas = resultSet.getInt("derrotas");
                 int userEmpates = resultSet.getInt("empates");
-                return new user(userId, foundUsername, userVictorias, userDerrotas, userEmpates);
+                return new User(userId, foundUsername, userVictorias, userDerrotas, userEmpates);
             } else {
                 System.out.println("Usuario no encontrado");
             }

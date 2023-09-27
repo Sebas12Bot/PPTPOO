@@ -3,7 +3,7 @@ package dominio;
 import javax.swing.*;
 import java.util.Arrays;
 
-public class ventana {
+public class Ventana {
 
     private static final Object[] OPCIONES = Arrays.asList("Ver estadisticas", "Jugar", "Ver Instrucciones").toArray();
     private static final String TITULO = "POO - Piedra, Papel o Tijera";
@@ -13,8 +13,8 @@ public class ventana {
     public static int perdidas = 0;
 
     public static void iniciarJuego(String nombre) {
-        user user = new user();
-        user usuarioEncontrado = user.obtenerUsuarioPorUsername(nombre);
+        User user = new User();
+        User usuarioEncontrado = user.obtenerUsuarioPorUsername(nombre);
 
         if (usuarioEncontrado != null) {
             System.out.println("Información del usuario:");
@@ -69,9 +69,9 @@ public class ventana {
     }
 
     public static void jugarPartida(String nombre) {
-        String eleccionJg1 = declaraciones.pedirEleccion(nombre);
-        String eleccionJg2 = declaraciones.obtenerEleccionAleatoria();
-        String resultado = declaraciones.verificarGanador(eleccionJg1, eleccionJg2);
+        String eleccionJg1 = Declaraciones.pedirEleccion(nombre);
+        String eleccionJg2 = Declaraciones.obtenerEleccionAleatoria();
+        String resultado = Declaraciones.verificarGanador(eleccionJg1, eleccionJg2);
         mostrarResultado(nombre, eleccionJg1, eleccionJg2, resultado);
     }
 
