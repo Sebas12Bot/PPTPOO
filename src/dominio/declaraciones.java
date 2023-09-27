@@ -9,7 +9,7 @@ public class declaraciones {
     public static String pedirEleccion(String nombre) {
         return (String) JOptionPane.showInputDialog(null, nombre + " !A jugar!\n" +
                         "Tome su desicion: ", "POO - Piedra, Papel o Tijera", JOptionPane.QUESTION_MESSAGE,
-                ventana.icono, Arrays.asList("Piedra", "Papel", "Tijera").toArray(), 0);
+                null, Arrays.asList("Piedra", "Papel", "Tijera").toArray(), 0);
     }
 
     public static String obtenerEleccionAleatoria() {
@@ -35,6 +35,6 @@ public class declaraciones {
     }
 
     public static String pedirNombre(String mensaje) {
-        return (String) JOptionPane.showInputDialog(null, mensaje, "POO - Piedra, Papel o Tijera", JOptionPane.QUESTION_MESSAGE, ventana.icono, null, "");
+        return (String) JOptionPane.showInputDialog(null, mensaje, "POO - Piedra, Papel o Tijera", JOptionPane.QUESTION_MESSAGE, null, null, "");
     }
 }
