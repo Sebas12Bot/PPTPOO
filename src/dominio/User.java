@@ -4,20 +4,26 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.UUID;
+
 
 public class User {
     private Connection connection;
-    private int id;
+    private String id;
     private String username;
     private int victorias;
     private int derrotas;
     private int empates;
 
+    UUID uuid = UUID.randomUUID();
+    public String id_user = uuid.toString();
+
     public User() {
         connection = DataBase.getConnection();
     }
 
-    public User(int id, String username, int victorias, int derrotas, int empates) {
+
+    public User(String id, String username, int victorias, int derrotas, int empates) {
         this.id = id;
         this.username = username;
         this.victorias = victorias;
@@ -26,7 +32,7 @@ public class User {
         connection = DataBase.getConnection();
     }
 
-    public int getId() {
+    public String getId() {
         return id;
     }
 
@@ -46,7 +52,7 @@ public class User {
         return empates;
     }
 
-    public void setId(int id) {
+    public void setId(String id) {
         this.id = id;
     }
 
@@ -67,32 +73,41 @@ public class User {
     }
 
     public void crearUsuario(String username) {
-        String sqlInsertUsuario = "INSERT INTO usuarios (username) VALUES (?)";
-        String sqlInsertPuntuacion = "INSERT INTO puntuaciones (id_usuario, victories, defeats, draws) VALUES (?, 0, 0, 0)";
-
         try {
-            PreparedStatement statementUsuario = connection.prepareStatement(sqlInsertUsuario);
-            statementUsuario.setString(1, username);
-            statementUsuario.executeUpdate();
-            String sqlObtenerID = "SELECT LAST_INSERT_ID() AS id";
-            PreparedStatement statementID = connection.prepareStatement(sqlObtenerID);
-            ResultSet resultSet = statementID.executeQuery();
+            // Abre una transacción en la base de datos
+            connection.setAutoCommit(false);
 
-            int userId = 0;
-            if (resultSet.next()) {
-                userId = resultSet.getInt("id");
-            }
+            // Inserta un nuevo usuario en la tabla 'usuarios'
+            String sqlInsertUsuario = "INSERT INTO usuarios (id, username) VALUES (?, ?)";
+            PreparedStatement usuarioStatement = connection.prepareStatement(sqlInsertUsuario);
+            usuarioStatement.setString(1, id_user);
+            usuarioStatement.setString(2, username);
+            usuarioStatement.executeUpdate();
+            // Inserta una nueva puntuación en la tabla 'puntuaciones'
+            String sqlInsertPuntuacion = "INSERT INTO puntuaciones (id_usuario, victorias, derrotas, empates) VALUES (?, 0, 0, 0)";
+            PreparedStatement puntuacionStatement = connection.prepareStatement(sqlInsertPuntuacion);
+            puntuacionStatement.setString(1, id_user);
+            puntuacionStatement.executeUpdate();
 
-            PreparedStatement statementPuntuacion = connection.prepareStatement(sqlInsertPuntuacion);
-            statementPuntuacion.setInt(1, userId);
-            statementPuntuacion.executeUpdate();
-
+            // Confirma la transacción
+            connection.commit();
             System.out.println("Usuario creado exitosamente");
         } catch (SQLException e) {
+            try {
+                // En caso de error, revierte la transacción
+                connection.rollback();
+            } catch (SQLException rollbackException) {
+                rollbackException.printStackTrace();
+            }
             e.printStackTrace();
+        } finally {
+            try {
+                connection.setAutoCommit(true);
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
         }
     }
-
     public User obtenerUsuarioPorUsername(String username) {
         String sql = "SELECT u.id, u.username, p.victorias, p.derrotas, p.empates FROM usuarios u " +
                 "LEFT JOIN puntuaciones p ON u.id = p.id_usuario WHERE u.username = ?";
@@ -102,7 +117,7 @@ public class User {
             ResultSet resultSet = statement.executeQuery();
 
             if (resultSet.next()) {
-                int userId = resultSet.getInt("id");
+                String userId = resultSet.getString("id"); // Corrección aquí
                 String foundUsername = resultSet.getString("username");
                 int userVictorias = resultSet.getInt("victorias");
                 int userDerrotas = resultSet.getInt("derrotas");
@@ -116,5 +131,30 @@ public class User {
         }
 
         return null;
+    }
+
+    public void actualizarPuntuacion(String userId, int nuevasVictorias, int nuevasDerrotas, int nuevosEmpates) {
+        try {
+            // Actualiza las puntuaciones del usuario en la tabla 'puntuaciones'
+            String sqlUpdatePuntuacion = "UPDATE puntuaciones SET victorias = ?, derrotas = ?, empates = ? WHERE id_usuario = ?";
+            PreparedStatement puntuacionStatement = connection.prepareStatement(sqlUpdatePuntuacion);
+            puntuacionStatement.setInt(1, nuevasVictorias);
+            puntuacionStatement.setInt(2, nuevasDerrotas);
+            puntuacionStatement.setInt(3, nuevosEmpates);
+            puntuacionStatement.setString(4, userId);
+            int rowsUpdated = puntuacionStatement.executeUpdate();
+
+            if (rowsUpdated > 0) {
+                System.out.println("Puntuación actualizada exitosamente");
+                // Actualiza las propiedades locales del objeto User
+                this.victorias = nuevasVictorias;
+                this.derrotas = nuevasDerrotas;
+                this.empates = nuevosEmpates;
+            } else {
+                System.out.println("Usuario no encontrado");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 }

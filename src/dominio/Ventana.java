@@ -8,6 +8,7 @@ public class Ventana {
     private static final Object[] OPCIONES = Arrays.asList("Ver estadisticas", "Jugar", "Ver Instrucciones").toArray();
     private static final String TITULO = "POO - Piedra, Papel o Tijera";
 
+
     public static int ganadas = 0;
     public static int empatadas = 0;
     public static int perdidas = 0;
@@ -20,9 +21,10 @@ public class Ventana {
             System.out.println("Información del usuario:");
             System.out.println("ID: " + usuarioEncontrado.getId());
             System.out.println("Nombre de Usuario: " + usuarioEncontrado.getUsername());
-            System.out.println("Victorias: " + usuarioEncontrado.getVictorias()); //
+            System.out.println("Victorias: " + usuarioEncontrado.getVictorias());
             System.out.println("Derrotas: " + usuarioEncontrado.getDerrotas());
             System.out.println("Empates: " + usuarioEncontrado.getEmpates());
+            user.actualizarPuntuacion(usuarioEncontrado.getId(), 100, 200, 300);
         } else {
             System.out.println("El usuario no fue encontrado.");
             user.crearUsuario(nombre);
@@ -39,7 +41,7 @@ public class Ventana {
                     jugarPartida(nombre);
                     break;
                 case 0:
-                    verEstadisticas(nombre);
+                    verEstadisticas(nombre, user);
                     break;
             }
         }
@@ -59,13 +61,17 @@ public class Ventana {
     }
 
     public static void verInformacion() {
-        mostrarMensaje("El papel gana a la piedra envolviéndola; la piedra gana a la tijera golpeándola; y la tijera gana al papel cortándolo.");
+        mostrarMensaje("El papel gana a la piedra envolviendola; la piedra gana a la tijera golpeándola; y la tijera gana al papel cortandolo.");
     }
 
-    public static void verEstadisticas(String nombre) {
-        mostrarMensaje(nombre + " " + ganadas + " Partidas ganadas\n"
-                + nombre + " " + perdidas + " Partidas perdidas\n"
-                + empatadas + "  Partidas empatadas");
+    public static void verEstadisticas(String nombre, User user) {
+        int victoriasUsuario = user.getVictorias();
+        int derrotasUsuario = user.getDerrotas();
+        int empatesUsuario = user.getEmpates();
+
+        mostrarMensaje(nombre + " " + victoriasUsuario + " Partidas ganadas\n"
+                + nombre + " " + derrotasUsuario + " Partidas perdidas\n"
+                + empatesUsuario + " Partidas empatadas");
     }
 
     public static void jugarPartida(String nombre) {

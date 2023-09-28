@@ -15,7 +15,7 @@ public class DataBase {
         try {
             connection = DriverManager.getConnection(jdbcURL, username, password);
             if (connection != null) {
-                System.out.println("Conexión exitosa a la base de datos");
+                System.out.println("Conexion exitosa a la base de datos");
             } else {
                 System.out.println("Error al conectar a la base de datos");
             }
