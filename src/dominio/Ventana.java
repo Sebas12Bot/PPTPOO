@@ -61,7 +61,7 @@ public class Ventana {
     }
 
     public static void verInformacion() {
-        mostrarMensaje("El papel gana a la piedra envolviendola; la piedra gana a la tijera golpeándola; y la tijera gana al papel cortandolo.");
+        mostrarMensaje("El papel gana a la piedra envolviendola; la piedra gana a la tijera golpeandola; y la tijera gana al papel cortandolo.");
     }
 
     public static void verEstadisticas(String nombre, User user) {
