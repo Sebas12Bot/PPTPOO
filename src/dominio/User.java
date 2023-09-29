@@ -5,7 +5,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.UUID;
-
+import java.util.ArrayList;
+import java.util.List;
 
 public class User {
     private Connection connection;
@@ -52,49 +53,22 @@ public class User {
         return empates;
     }
 
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
-    }
-
-    public void setvictorias(int victorias) {
-        this.victorias = victorias;
-    }
-
-    public void setderrotas(int derrotas) {
-        this.derrotas = derrotas;
-    }
-
-    public void setempates(int empates) {
-        this.empates = empates;
-    }
-
     public void crearUsuario(String username) {
         try {
-            // Abre una transacción en la base de datos
             connection.setAutoCommit(false);
-
-            // Inserta un nuevo usuario en la tabla 'usuarios'
             String sqlInsertUsuario = "INSERT INTO usuarios (id, username) VALUES (?, ?)";
             PreparedStatement usuarioStatement = connection.prepareStatement(sqlInsertUsuario);
             usuarioStatement.setString(1, id_user);
             usuarioStatement.setString(2, username);
             usuarioStatement.executeUpdate();
-            // Inserta una nueva puntuación en la tabla 'puntuaciones'
             String sqlInsertPuntuacion = "INSERT INTO puntuaciones (id_usuario, victorias, derrotas, empates) VALUES (?, 0, 0, 0)";
             PreparedStatement puntuacionStatement = connection.prepareStatement(sqlInsertPuntuacion);
             puntuacionStatement.setString(1, id_user);
             puntuacionStatement.executeUpdate();
-
-            // Confirma la transacción
             connection.commit();
             System.out.println("Usuario creado exitosamente");
         } catch (SQLException e) {
             try {
-                // En caso de error, revierte la transacción
                 connection.rollback();
             } catch (SQLException rollbackException) {
                 rollbackException.printStackTrace();
@@ -108,6 +82,7 @@ public class User {
             }
         }
     }
+
     public User obtenerUsuarioPorUsername(String username) {
         String sql = "SELECT u.id, u.username, p.victorias, p.derrotas, p.empates FROM usuarios u " +
                 "LEFT JOIN puntuaciones p ON u.id = p.id_usuario WHERE u.username = ?";
@@ -117,7 +92,7 @@ public class User {
             ResultSet resultSet = statement.executeQuery();
 
             if (resultSet.next()) {
-                String userId = resultSet.getString("id"); // Corrección aquí
+                String userId = resultSet.getString("id");
                 String foundUsername = resultSet.getString("username");
                 int userVictorias = resultSet.getInt("victorias");
                 int userDerrotas = resultSet.getInt("derrotas");
@@ -135,7 +110,6 @@ public class User {
 
     public void actualizarPuntuacion(String userId, int nuevasVictorias, int nuevasDerrotas, int nuevosEmpates) {
         try {
-            // Actualiza las puntuaciones del usuario en la tabla 'puntuaciones'
             String sqlUpdatePuntuacion = "UPDATE puntuaciones SET victorias = ?, derrotas = ?, empates = ? WHERE id_usuario = ?";
             PreparedStatement puntuacionStatement = connection.prepareStatement(sqlUpdatePuntuacion);
             puntuacionStatement.setInt(1, nuevasVictorias);
@@ -145,8 +119,7 @@ public class User {
             int rowsUpdated = puntuacionStatement.executeUpdate();
 
             if (rowsUpdated > 0) {
-                System.out.println("Puntuación actualizada exitosamente");
-                // Actualiza las propiedades locales del objeto User
+                System.out.println("Puntuacion actualizada exitosamente");
                 this.victorias = nuevasVictorias;
                 this.derrotas = nuevasDerrotas;
                 this.empates = nuevosEmpates;
@@ -157,4 +130,31 @@ public class User {
             e.printStackTrace();
         }
     }
+
+    public List<User> obtenerRanking() {
+        List<User> ranking = new ArrayList<>();
+        String sql = "SELECT u.id, u.username, p.victorias, p.derrotas, p.empates " +
+                "FROM usuarios u LEFT JOIN puntuaciones p ON u.id = p.id_usuario " +
+                "ORDER BY p.victorias DESC";
+
+        try {
+            PreparedStatement statement = connection.prepareStatement(sql);
+            ResultSet resultSet = statement.executeQuery();
+
+            while (resultSet.next()) {
+                String userId = resultSet.getString("id");
+                String foundUsername = resultSet.getString("username");
+                int userVictorias = resultSet.getInt("victorias");
+                int userDerrotas = resultSet.getInt("derrotas");
+                int userEmpates = resultSet.getInt("empates");
+                ranking.add(new User(userId, foundUsername, userVictorias, userDerrotas, userEmpates));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return ranking;
+    }
+
+
 }
